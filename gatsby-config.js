@@ -9,15 +9,15 @@
  */
 module.exports = {
   siteMetadata: {
-    title: `Gatsby Starter Blog`,
+    title: `Minhyeok's Blog`,
     author: {
-      name: `Kyle Mathews`,
-      summary: `who lives and works in San Francisco building useful things.`,
+      name: `강민혁`,
+      summary: `FE Developer`,
     },
-    description: `A starter blog demonstrating what Gatsby can do.`,
-    siteUrl: `https://gatsbystarterblogsource.gatsbyjs.io/`,
+    description: `FE Developer 강민혁의 블로그입니다.`,
+    siteUrl: `https://minhyeok-kang.netlify.app`,
     social: {
-      twitter: `kylemathews`,
+      linkedin: `minhyeok-kang-9a6367202`,
     },
   },
   plugins: [
