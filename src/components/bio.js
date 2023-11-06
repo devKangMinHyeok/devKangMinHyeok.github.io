@@ -9,6 +9,9 @@ import * as React from "react"
 import { useStaticQuery, graphql } from "gatsby"
 import { StaticImage } from "gatsby-plugin-image"
 
+import { LinkedinLinkIcon } from "./social-link-icons/linkedin-link-icon"
+import { GithubLinkIcon } from "./social-link-icons/github-link-icon"
+
 const Bio = () => {
   const data = useStaticQuery(graphql`
     query BioQuery {
@@ -20,6 +23,7 @@ const Bio = () => {
           }
           social {
             linkedin
+            github
           }
         }
       }
@@ -36,26 +40,47 @@ const Bio = () => {
         className="bio-avatar"
         layout="fixed"
         formats={["auto", "webp", "avif"]}
-        src="../images/profile-pic.png"
-        width={50}
-        height={50}
+        src="../images/profile-picture.jpeg"
+        width={100}
+        height={100}
         quality={95}
         alt="Profile picture"
       />
-      {author?.name && (
-        <p>
-          <strong>{author.name}</strong> {author?.summary || null}
-          {` `}
-          <a
-            href={`https://www.linkedin.com/in/${social?.linkedin || ``}`}
-            target="_blank"
-          >
-            on Linkedin
-          </a>
-        </p>
-      )}
+      <div>
+        {author?.name ? (
+          <div>
+            <p>
+              <strong>{author.name}</strong>
+            </p>
+            <p>{author?.summary || null}</p>
+          </div>
+        ) : null}
+        <div className="social-link-list">
+          {SocialList.map(socialItem => {
+            const SocialIcon = socialItem.component
+            const socialId = social?.[socialItem.name.toLowerCase()]
+
+            if (!socialId) {
+              return null
+            }
+
+            return <SocialIcon key={socialItem.name} id={socialId} />
+          })}
+        </div>
+      </div>
     </div>
   )
 }
 
 export default Bio
+
+const SocialList = [
+  {
+    name: "github",
+    component: GithubLinkIcon,
+  },
+  {
+    name: "linkedin",
+    component: LinkedinLinkIcon,
+  },
+]

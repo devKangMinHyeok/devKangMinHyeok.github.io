@@ -1,4 +1,5 @@
 /* CSS Custom Properties Definitions */
+@import url(//fonts.googleapis.com/earlyaccess/notosanskr.css);
 
 :root {
   --maxWidth-none: "none";
@@ -33,9 +34,12 @@
     "Noto Color Emoji";
   --fontFamily-serif: "Merriweather", "Georgia", Cambria, "Times New Roman",
     Times, serif;
-  --font-body: var(--fontFamily-serif);
-  --font-heading: var(--fontFamily-sans);
-  --fontWeight-normal: 400;
+  --fontFamily-kr: "Noto Sans KR", sans-serif;
+  --font-body: var(--fontFamily-kr);
+  --font-heading: var(--fontFamily-kr);
+  --fontWeight-light: 400;
+  --fontWeight-normal: 500;
+  --fontWeight-semibold: 600;
   --fontWeight-bold: 700;
   --fontWeight-black: 900;
   --fontSize-root: 16px;
@@ -52,9 +56,10 @@
   --fontSize-5: 2.074rem;
   --fontSize-6: 2.488rem;
   --fontSize-7: 2.986rem;
-  --color-primary: #005b99;
+  --color-primary: #400099;
   --color-text: #2e353f;
   --color-text-light: #4f5969;
+  --color-text-lighter: #6f7782;
   --color-heading: #1a202c;
   --color-heading-black: black;
   --color-accent: #d1dce5;
@@ -228,7 +233,7 @@ table thead tr th {
 /* Link */
 
 a {
-  color: var(--color-primary);
+  color: var(--color-heading-black);
 }
 
 a:hover,
@@ -244,10 +249,9 @@ a:focus {
   padding: var(--spacing-10) var(--spacing-5);
 }
 
-.global-wrapper[data-is-root-path="true"] .bio {
+.global-wrapper[data-is-root-path="true"] {
   margin-bottom: var(--spacing-20);
 }
-
 .global-header {
   margin-bottom: var(--spacing-12);
 }
@@ -268,7 +272,7 @@ a:focus {
 
 .post-list-item h2 {
   font-size: var(--fontSize-4);
-  color: var(--color-primary);
+  color: var(--color-heading-black);
   margin-bottom: var(--spacing-2);
   margin-top: var(--spacing-0);
 }
@@ -286,7 +290,7 @@ a:focus {
 
 .bio {
   display: flex;
-  margin-bottom: var(--spacing-16);
+  margin-bottom: var(--spacing-8);
 }
 
 .bio p {
@@ -315,6 +319,45 @@ a:focus {
 
 .gatsby-highlight {
   margin-bottom: var(--spacing-8);
+}
+
+.home-nav {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  gap: var(--spacing-6);
+  padding: var(--spacing-0);
+  margin: var(--spacing-0);
+}
+
+.home-nav-list {
+  display: flex;
+}
+
+.home-nav-link {
+  font-weight: var(--fontWeight-light);
+  font-family: var(--font-heading);
+  text-decoration: none;
+  font-size: var(--fontSize-1);
+  color: var(--color-text-lighter);
+  transition: color 0.2s ease-out;
+  padding-bottom: var(--spacing-2);
+}
+
+.active {
+  color: var(--color-heading-black);
+  border-bottom: 1px solid var(--color-heading-black);
+}
+
+.home-nav-link:hover {
+  color: var(--color-heading-black);
+}
+
+.social-link-list {
+  margin-top: var(--spacing-2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-1);
 }
 
 /* Media queries */

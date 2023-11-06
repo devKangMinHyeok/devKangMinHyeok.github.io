@@ -18,6 +18,7 @@ module.exports = {
     siteUrl: `https://minhyeok-kang.netlify.app`,
     social: {
       linkedin: `minhyeok-kang-9a6367202`,
+      github: `devKangMinHyeok`,
     },
   },
   plugins: [
@@ -80,6 +81,7 @@ module.exports = {
                 return Object.assign({}, node.frontmatter, {
                   description: node.excerpt,
                   date: node.frontmatter.date,
+                  tag: node.frontmatter.tag,
                   url: site.siteMetadata.siteUrl + node.fields.slug,
                   guid: site.siteMetadata.siteUrl + node.fields.slug,
                   custom_elements: [{ "content:encoded": node.html }],
@@ -97,12 +99,13 @@ module.exports = {
                   frontmatter {
                     title
                     date
+                    tag
                   }
                 }
               }
             }`,
             output: "/rss.xml",
-            title: "Gatsby Starter Blog RSS Feed",
+            title: "Minhyeok's Blog RSS Feed",
           },
         ],
       },
@@ -110,7 +113,7 @@ module.exports = {
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `Gatsby Starter Blog`,
+        name: `Minhyeok's Blog`,
         short_name: `Gatsby`,
         start_url: `/`,
         background_color: `#ffffff`,
@@ -118,7 +121,22 @@ module.exports = {
         // https://css-tricks.com/meta-theme-color-and-trickery/
         // theme_color: `#663399`,
         display: `minimal-ui`,
-        icon: `src/images/gatsby-icon.png`, // This path is relative to the root of the site.
+        icon: `src/images/bird-icon-removebg.png`, // This path is relative to the root of the site.
+      },
+    },
+    {
+      resolve: `gatsby-alias-imports`,
+      options: {
+        aliases: {
+          styles: `src/styles`,
+          config: `config/`,
+          "@utils": "src/utils/",
+          "@components": "src/components/",
+          "@pages": "src/pages/",
+          "@templates": "src/templates/",
+          "@images": "src/images/",
+          "@svg-icons": "src/svg-icons/",
+        },
       },
     },
   ],

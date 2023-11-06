@@ -1,108 +1,39 @@
 ---
-title: New Beginnings
+title: 코드 스플리팅을 통한 파일 크기 최적화
 date: "2015-05-28T22:40:32.169Z"
-description: This is a custom description for SEO and Open Graph purposes, rather than the default generated excerpt. Simply add a description field to the frontmatter.
+description: 코드 스플리팅을 통한 파일크기를 최적화 합니다
+tag: javascript
+series: 최적화 시리즈
 ---
 
-Far far away, behind the word mountains, far from the countries Vokalia and
-Consonantia, there live the blind texts. Separated they live in Bookmarksgrove
-right at the coast of the Semantics, a large language ocean. A small river named
-Duden flows by their place and supplies it with the necessary regelialia.
+## 코드 스플리팅: 효율적인 자바스크립트 번들링
 
-## On deer horse aboard tritely yikes and much
+코드 스플리팅(Code Splitting)은 모던 웹 개발에서 중요한 기술 중 하나입니다. 이 기술은 웹 애플리케이션의 성능을 향상시키고 사용자 경험을 개선하는 데 도움이 됩니다. 이 아티클에서는 코드 스플리팅이 무엇인지, 왜 필요한지, 그리고 어떻게 구현하는지에 대해 자세히 알아보겠습니다.
 
-The Big Oxmox advised her not to do so, because there were thousands of bad
-Commas, wild Question Marks and devious Semikoli, but the Little Blind Text
-didn’t listen. She packed her seven versalia, put her initial into the belt and
-made herself on the way.
+## 코드 스플리팅이란?
 
-- This however showed weasel
-- Well uncritical so misled
-  - this is very interesting
-- Goodness much until that fluid owl
+코드 스플리팅은 웹 애플리케이션의 자바스크립트 코드를 여러 개의 작은 청크로 나누는 기술입니다. 이렇게 나눈 코드 청크는 필요할 때만 로드되므로 초기 페이지 로딩 시간을 줄이고, 사용자가 실제로 해당 코드를 필요로 할 때까지 불필요한 데이터를 다운로드하지 않도록 합니다.
 
-When she reached the first hills of the **Italic Mountains**, she had a last
-view back on the skyline of her hometown _Bookmarksgrove_, the headline of
-[Alphabet Village](http://google.com) and the subline of her own road, the Line
-Lane. Pityful a rhetoric question ran over her cheek, then she continued her
-way. On her way she met a copy.
+## 코드 스플리팅의 필요성
 
-### Overlaid the jeepers uselessly much excluding
+1. 초기 로딩 시간 감소: 모든 자바스크립트 코드를 하나의 번들로 로드하는 것보다 작은 청크로 나눠 로드하면 초기 로딩 시간이 크게 감소합니다.
 
-But nothing the copy said could convince her and so it didn’t take long until a
-few insidious Copy Writers ambushed her, made her drunk with
-[Longe and Parole](http://google.com) and dragged her into their agency, where
-they abused her for their projects again and again. And if she hasn’t been
-rewritten, then they are still using her.
+2. 대역폭 절약: 사용자가 앱을 처음 로드할 때 필요한 코드만 다운로드하므로 대역폭을 효율적으로 활용할 수 있습니다.
 
-> Far far away, behind the word mountains, far from the countries Vokalia and
-> Consonantia, there live the blind texts. Separated they live in Bookmarksgrove
-> right at the coast of the Semantics, a large language ocean.
+3. 더 나은 사용자 경험: 빠른 초기 로딩은 사용자 경험을 향상시킵니다. 사용자는 앱이 더 빨리 시작되고 반응성이 향상되는 것을 느낄 것입니다.
 
-It is a paradisematic country, in which roasted parts of sentences fly into your
-mouth. Even the all-powerful Pointing has no control about the blind texts it is
-an almost unorthographic life One day however a small line of blind text by the
-name of Lorem Ipsum decided to leave for the far World of Grammar.
+## 코드 스플리팅 구현 방법
 
-### According a funnily until pre-set or arrogant well cheerful
+### 1. 동적 `import()` 사용
 
-The Big Oxmox advised her not to do so, because there were thousands of bad
-Commas, wild Question Marks and devious Semikoli, but the Little Blind Text
-didn’t listen. She packed her seven versalia, put her initial into the belt and
-made herself on the way.
+ES6의 `import()` 함수를 사용하여 코드 스플리팅을 구현할 수 있습니다. 이 함수는 모듈을 동적으로 로드하고 Promise를 반환합니다. 예를 들어:
 
-1.  So baboon this
-2.  Mounted militant weasel gregariously admonishingly straightly hey
-3.  Dear foresaw hungry and much some overhung
-4.  Rash opossum less because less some amid besides yikes jeepers frenetic
-    impassive fruitlessly shut
-
-When she reached the first hills of the Italic Mountains, she had a last view
-back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet
-Village and the subline of her own road, the Line Lane. Pityful a rhetoric
-question ran over her cheek, then she continued her way. On her way she met a
-copy.
-
-> The copy warned the Little Blind Text, that where it came from it would have
-> been rewritten a thousand times and everything that was left from its origin
-> would be the word "and" and the Little Blind Text should turn around and
-> return to its own, safe country.
-
-But nothing the copy said could convince her and so it didn’t take long until a
-few insidious Copy Writers ambushed her, made her drunk with Longe and Parole
-and dragged her into their agency, where they abused her for their projects
-again and again. And if she hasn’t been rewritten, then they are still using
-her. Far far away, behind the word mountains, far from the countries Vokalia and
-Consonantia, there live the blind texts.
-
-#### Silent delightfully including because before one up barring chameleon
-
-Separated they live in Bookmarksgrove right at the coast of the Semantics, a
-large language ocean. A small river named Duden flows by their place and
-supplies it with the necessary regelialia. It is a paradisematic country, in
-which roasted parts of sentences fly into your mouth.
-
-Even the all-powerful Pointing has no control about the blind texts it is an
-almost unorthographic life One day however a small line of blind text by the
-name of Lorem Ipsum decided to leave for the far World of Grammar. The Big Oxmox
-advised her not to do so, because there were thousands of bad Commas, wild
-Question Marks and devious Semikoli, but the Little Blind Text didn’t listen.
-
-##### Wherever far wow thus a squirrel raccoon jeez jaguar this from along
-
-She packed her seven versalia, put her initial into the belt and made herself on
-the way. When she reached the first hills of the Italic Mountains, she had a
-last view back on the skyline of her hometown Bookmarksgrove, the headline of
-Alphabet Village and the subline of her own road, the Line Lane. Pityful a
-rhetoric question ran over her cheek, then she continued her way. On her way she
-met a copy.
-
-###### Slapped cozy a that lightheartedly and far
-
-The copy warned the Little Blind Text, that where it came from it would have
-been rewritten a thousand times and everything that was left from its origin
-would be the word "and" and the Little Blind Text should turn around and return
-to its own, safe country. But nothing the copy said could convince her and so it
-didn’t take long until a few insidious Copy Writers ambushed her, made her drunk
-with Longe and Parole and dragged her into their agency, where they abused her
-for their projects again and again.
+```javascript
+import("./module.js")
+  .then(module => {
+    // 모듈 사용
+  })
+  .catch(error => {
+    // 로딩 중 오류 처리
+  })
+```
