@@ -1,6 +1,7 @@
 ---
 title: SWR을 사용하여 외부 상태 관리하기
 date: "2015-05-06T23:46:37.121Z"
+tags: [javascript, javascript]
 ---
 
 Wow! I love blogging so much already.

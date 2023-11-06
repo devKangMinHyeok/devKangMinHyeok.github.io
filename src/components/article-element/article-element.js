@@ -1,8 +1,10 @@
 import * as React from "react"
+
 import ArticleElementHeader from "./article-element-header"
 import ArticleElementSection from "./article-element-section"
+import ArticleElementTags from "./article-element-tags"
 
-const ArticleElement = ({ title, description, date, slug, tag }) => {
+const ArticleElement = ({ title, description, date, slug, tags }) => {
   return (
     <li key={slug}>
       <article
@@ -12,7 +14,7 @@ const ArticleElement = ({ title, description, date, slug, tag }) => {
       >
         <ArticleElementHeader slug={slug} title={title} date={date} />
         <ArticleElementSection description={description} />
-        <small>{tag}</small>
+        <ArticleElementTags tags={tags} />
       </article>
       <hr />
     </li>

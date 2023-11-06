@@ -2,7 +2,7 @@
 title: 코드 스플리팅을 통한 파일 크기 최적화
 date: "2015-05-28T22:40:32.169Z"
 description: 코드 스플리팅을 통한 파일크기를 최적화 합니다
-tag: javascript
+tags: [javascript, ts]
 series: 최적화 시리즈
 ---
 

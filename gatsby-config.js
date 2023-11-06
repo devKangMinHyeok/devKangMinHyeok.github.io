@@ -9,7 +9,7 @@
  */
 module.exports = {
   siteMetadata: {
-    title: `Minhyeok's Blog`,
+    title: `<dev.minhyeok />`,
     author: {
       name: `강민혁`,
       summary: `FE Developer`,
@@ -81,7 +81,7 @@ module.exports = {
                 return Object.assign({}, node.frontmatter, {
                   description: node.excerpt,
                   date: node.frontmatter.date,
-                  tag: node.frontmatter.tag,
+                  tags: node.frontmatter.tags,
                   url: site.siteMetadata.siteUrl + node.fields.slug,
                   guid: site.siteMetadata.siteUrl + node.fields.slug,
                   custom_elements: [{ "content:encoded": node.html }],
@@ -99,7 +99,7 @@ module.exports = {
                   frontmatter {
                     title
                     date
-                    tag
+                    tags
                   }
                 }
               }
@@ -137,6 +137,7 @@ module.exports = {
           "@images": "src/images/",
           "@svg-icons": "src/svg-icons/",
         },
+        extensions: ["js"],
       },
     },
   ],

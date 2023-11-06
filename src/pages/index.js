@@ -4,12 +4,14 @@ import { graphql } from "gatsby"
 import Bio from "@components/bio"
 import Layout from "@components/layout"
 import Seo from "@components/seo"
-import ArticleElement from "@components/article-element/article-element"
 import HomeNav from "@components/home-nav"
+import ArticleList from "@components/article-element/article-list"
+import TagSelector from "@components/tag-selector/tag-selector"
 
 const BlogIndex = ({ data, location }) => {
   const siteTitle = data.site.siteMetadata?.title || `Title`
   const posts = data.allMarkdownRemark.nodes
+  const allTags = data.allMarkdownRemark.group
 
   if (posts.length === 0) {
     return (
@@ -24,21 +26,8 @@ const BlogIndex = ({ data, location }) => {
     <Layout location={location} title={siteTitle}>
       <Bio />
       <HomeNav location={location} />
-      <ol style={{ listStyle: `none` }}>
-        {posts.map(post => {
-          const title = post.frontmatter.title || post.fields.slug
-          return (
-            <ArticleElement
-              title={title}
-              description={post.frontmatter.description || post.excerpt}
-              date={post.frontmatter.date}
-              slug={post.fields.slug}
-              tag={post.frontmatter.tag}
-              key={post.fields.slug}
-            />
-          )
-        })}
-      </ol>
+      <TagSelector tags={allTags} />
+      <ArticleList posts={posts} />
     </Layout>
   )
 }
@@ -60,6 +49,10 @@ export const pageQuery = graphql`
       }
     }
     allMarkdownRemark(sort: { frontmatter: { date: DESC } }) {
+      group(field: frontmatter___tags) {
+        fieldValue
+        totalCount
+      }
       nodes {
         excerpt
         fields {
@@ -69,6 +62,7 @@ export const pageQuery = graphql`
           date(formatString: "MMMM DD, YYYY")
           title
           description
+          tags
         }
       }
     }
