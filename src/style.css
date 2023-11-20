@@ -57,6 +57,8 @@
   --fontSize-6: 2.488rem;
   --fontSize-7: 2.986rem;
   --color-primary: #400099;
+  --color-secondary: #984fff;
+  --color-secondary-light: #b08bff;
   --color-text: #2e353f;
   --color-text-light: #4f5969;
   --color-text-lighter: #6f7782;
@@ -168,13 +170,15 @@ p {
   --x-height-multiplier: 0.35;
   margin: var(--spacing-0) var(--spacing-0) var(--spacing-8) var(--spacing-0);
   padding: var(--spacing-0);
+  text-align: justify;
+  text-underline-offset: 5px;
 }
 
 ul,
 ol {
   margin-left: var(--spacing-0);
   margin-right: var(--spacing-0);
-  padding: var(--spacing-0);
+  padding: var(--spacing-4);
   margin-bottom: var(--spacing-8);
   list-style-position: outside;
   list-style-image: none;
@@ -201,11 +205,11 @@ li > ul {
 
 blockquote {
   color: var(--color-text-light);
-  margin-left: calc(-1 * var(--spacing-6));
-  margin-right: var(--spacing-8);
+  margin-left: calc(-1 * var(--spacing-0));
+  margin-right: var(--spacing-0);
   padding: var(--spacing-0) var(--spacing-0) var(--spacing-0) var(--spacing-6);
   border-left: var(--spacing-1) solid var(--color-primary);
-  font-size: var(--fontSize-2);
+  font-size: var(--fontSize-1);
   font-style: italic;
   margin-bottom: var(--spacing-8);
 }
@@ -233,12 +237,12 @@ table thead tr th {
 /* Link */
 
 a {
-  color: var(--color-heading-black);
+  color: var(--color-secondary);
 }
 
 a:hover,
 a:focus {
-  text-decoration: none;
+  color: var(--color-secondary-light);
 }
 
 /* Custom classes */

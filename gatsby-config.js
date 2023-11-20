@@ -9,7 +9,7 @@
  */
 module.exports = {
   siteMetadata: {
-    title: `<dev.minhyeok />`,
+    title: `<minhyeok.dev />`,
     author: {
       name: `강민혁`,
       summary: `FE Developer`,
