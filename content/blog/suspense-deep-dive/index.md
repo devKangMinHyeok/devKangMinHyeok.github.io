@@ -8,8 +8,13 @@ series: React Deep dive
 
 ## 목차
 
-- [React Suspense가 등장한 배경](#React-Suspense가-등장한-배경)
-  - [React Suspense가 등장한 배경](#React-Suspense가-등장한-배경)
+- [React Suspense가 등장한 배경](#react-suspense가-등장한-배경)
+  - [공식 문서에서 배경 읽어보기](#공식-문서에서-배경-읽어보기)
+  - [Suspense 그 이전에 React Concurrent Feature부터](#suspense-그-이전에-react-concurrent-feature부터)
+  - [React의 Rendering은 원래 멈출 수 없어](#react의-rendering은-원래-멈출-수-없어)
+  - [React에서 렌더링이란?](#react에서-렌더링이란)
+  - [다시 돌아와 Suspense는 왜 등장했나](#다시-돌아와-suspense는-왜-등장했나)
+- [Reference](#reference)
 
 ## React Suspense가 등장한 배경
 
@@ -36,7 +41,7 @@ series: React Deep dive
 
 그래서 따로 도입 배경을 찾아보기로 했다.
 
-## Suspense 그 이전에 React Concurrent Feature부터
+### Suspense 그 이전에 React Concurrent Feature부터
 
 **Suspense**의 등장 배경을 이해하기 위해서는 기본적으로, React `v18`의 핵심인 **Concurrent Feature**에 대해 이해하고 있어야 한다.
 
