@@ -172,7 +172,7 @@ p {
   --x-height-multiplier: 0.35;
   margin: var(--spacing-0) var(--spacing-0) var(--spacing-8) var(--spacing-0);
   padding: var(--spacing-0);
-  text-align: justify;
+  text-justify: auto;
   text-underline-offset: 5px;
 }
 

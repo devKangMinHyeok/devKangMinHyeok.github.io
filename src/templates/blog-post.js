@@ -13,51 +13,121 @@ const BlogPostTemplate = ({
 
   return (
     <Layout location={location} title={siteTitle}>
-      <article
-        className="blog-post"
-        itemScope
-        itemType="http://schema.org/Article"
+      <Article post={post} />
+      <FooterNav previous={previous} next={next} />
+    </Layout>
+  )
+}
+
+export default BlogPostTemplate
+
+const Article = ({ post }) => {
+  return (
+    <article
+      className="blog-post"
+      itemScope
+      itemType="http://schema.org/Article"
+    >
+      <header>
+        <h1 itemProp="headline">{post.frontmatter.title}</h1>
+        <p>{post.frontmatter.date}</p>
+      </header>
+      <section
+        dangerouslySetInnerHTML={{ __html: post.html }}
+        itemProp="articleBody"
+      />
+      <hr />
+      <footer>
+        <Bio />
+      </footer>
+    </article>
+  )
+}
+
+const FooterNav = ({ previous, next }) => {
+  return (
+    <nav className="blog-post-nav">
+      <ul
+        style={{
+          display: `flex`,
+          width: `100%`,
+          flexWrap: `wrap`,
+          justifyContent: `space-between`,
+          gap: `10px`,
+          listStyle: `none`,
+          padding: 0,
+        }}
       >
-        <header>
-          <h1 itemProp="headline">{post.frontmatter.title}</h1>
-          <p>{post.frontmatter.date}</p>
-        </header>
-        <section
-          dangerouslySetInnerHTML={{ __html: post.html }}
-          itemProp="articleBody"
-        />
-        <hr />
-        <footer>
-          <Bio />
-        </footer>
-      </article>
-      <nav className="blog-post-nav">
-        <ul
+        {previous && <PostLink post={previous} rel="prev" />}
+        {next && <PostLink post={next} rel="next" />}
+      </ul>
+    </nav>
+  )
+}
+
+const PostLink = ({ post, rel }) => {
+  return (
+    <li style={{ flex: 1 }}>
+      <Link
+        to={post.fields.slug}
+        rel={rel}
+        style={{
+          display: "block",
+          borderRadius: "5px",
+          padding: "20px",
+          textDecoration: `none`,
+          color: "black",
+          boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+        }}
+      >
+        <div
           style={{
-            display: `flex`,
-            flexWrap: `wrap`,
-            justifyContent: `space-between`,
-            listStyle: `none`,
-            padding: 0,
+            display: "flex",
+            flexDirection: "column",
           }}
         >
-          <li>
-            {previous && (
-              <Link to={previous.fields.slug} rel="prev">
-                ← {previous.frontmatter.title}
-              </Link>
+          <div
+            style={{
+              color: "gray",
+              marginBottom: "5px",
+              fontSize: "14px",
+            }}
+          >
+            {rel === "prev" ? (
+              <div>← Prev</div>
+            ) : (
+              <div
+                style={{
+                  textAlign: "right",
+                }}
+              >
+                Next →
+              </div>
             )}
-          </li>
-          <li>
-            {next && (
-              <Link to={next.fields.slug} rel="next">
-                {next.frontmatter.title} →
-              </Link>
-            )}
-          </li>
-        </ul>
-      </nav>
-    </Layout>
+          </div>
+          <div
+            style={{
+              fontSize: "15px",
+              fontWeight: "600",
+            }}
+          >
+            <div>
+              {rel === "prev" ? (
+                <div> {post.frontmatter.title}</div>
+              ) : (
+                <div
+                  style={{
+                    textAlign: "right",
+                  }}
+                >
+                  {post.frontmatter.title}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </Link>
+    </li>
   )
 }
 
@@ -69,8 +139,6 @@ export const Head = ({ data: { markdownRemark: post } }) => {
     />
   )
 }
-
-export default BlogPostTemplate
 
 export const pageQuery = graphql`
   query BlogPostBySlug(

@@ -27,7 +27,7 @@ series: React Deep dive
 문서에서 Suspense를 검색해서 바로 보이는 화면은 아래와 같다.
 ![Alt text](image-1.png)
 
-`<Suspense>` 라는 컴포넌트로, `<SomeComponent/>` 를 감싸고 있고,
+`<Suspense>` 컴포넌트로, `<SomeComponent/>` 를 감싸고 있고,
 `<Suspense>` 컴포넌트에는 **fallback**이라는 props에 `<Loading/>` 이라는 컴포넌트를 넣고 있다.
 
 > EN) `<Suspense>` lets you display a fallback until its children have finished loading.
