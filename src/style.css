@@ -62,9 +62,11 @@
   --color-text: #2e353f;
   --color-text-light: #4f5969;
   --color-text-lighter: #6f7782;
+  --color-text-red: #9e0000;
   --color-heading: #1a202c;
   --color-heading-black: black;
   --color-accent: #e0e0e0;
+  --color-background: #f1f1f1;
 }
 
 /* HTML elements */
@@ -234,10 +236,15 @@ table thead tr th {
   border-bottom: 1px solid var(--color-accent);
 }
 
+code {
+  color: var(--color-secondary);
+}
+
 /* Link */
 
 a {
   color: var(--color-secondary);
+  text-underline-offset: 5px;
 }
 
 a:hover,

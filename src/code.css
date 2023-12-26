@@ -1,0 +1,12 @@
+:not(pre) > code[class*="language-"] {
+  padding: 0.15rem var(--spacing-1);
+  font-size: small;
+  margin: 0 0.2rem;
+  background-color: var(--color-background);
+  color: var(--color-primary);
+  text-shadow: none;
+}
+
+pre > code[class*="language-"] {
+  font-size: small;
+}
