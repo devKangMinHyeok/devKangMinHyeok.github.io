@@ -656,6 +656,22 @@ const [{ data: user }, { data: posts }] = useSuspenseQueries({
 
 #### redux & rtk-query
 
+**rtk-query**는 **react-query**나 **swr**처럼 **비동기 데이터 캐싱**을 지원하고, 사용법도 비슷하다.
+
+하지만, [suspense와 관련된 공식문서](https://redux-toolkit.js.org/rtk-query/api/created-api/api-slice-utils#description-9)에서는 아직 `suspense`에 대한 **정식 지원을 하지 않는 것**으로 보인다.
+
+> These thunks are primarily added **to add experimental support for suspense in the future.** They enable writing custom hooks that look up if RTK Query has already got a running query/mutation for a certain endpoint/argument combination, and retrieving that to throw it as a promise.
+>
+> [suspense와 관련된 rtk-query 공식문서](https://redux-toolkit.js.org/rtk-query/api/created-api/api-slice-utils#description-9)
+
+[[open issue] Support for Suspense in RTK Query #1574](https://github.com/reduxjs/redux-toolkit/issues/1574)와 같은 open된 이슈나, [[open PR] feat: add useSuspendAll hook & react/suspense example #2245](https://github.com/reduxjs/redux-toolkit/pull/2245)와 같은 open된 PR을 살펴보면, suspense에 대응하는 API를 만들기 위해 시도한 흔적이 있다.
+
+하지만 두 Issue와 PR 모두 2022년에 논의되었지만 아직도 Open된 상태로 방치되어있는 것으로 보아, **rtk-query**에서 **suspense에 대한 지원을 적극적으로 수행할 정도로 우선순위가 높아보이지 않는다.**
+
+만약 **rtk-query**와 **suspense**를 사용하는 방법을 찾는다면, 이 부분은 업데이트하도록 하겠다.
+
+현재로써 내가 찾아본 바로는, **suspense**를 위해 **rtk-query** library 자체에서 지원하는 **API는 아직 정식적으로 없는 것으로 보인다.**
+
 #### recoil
 
 #### jotai
