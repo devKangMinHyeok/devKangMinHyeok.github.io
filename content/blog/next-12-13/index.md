@@ -1,9 +1,10 @@
 ---
 title: Next SSR에 대한 고찰 with app router (v13)
-date: "2023-11-19"
+date: "2024-01-16"
 description: Nextjs의 SSR과 server component에 대해 자세히 알아보기. v13에서 도입한 app router는 어떤 문제를 해결하는가?
 tags: [JS, React, Next]
 series: React Deep dive
+isWriting: true
 ---
 
 ## 목차

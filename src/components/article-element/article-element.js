@@ -4,7 +4,14 @@ import ArticleElementHeader from "./article-element-header"
 import ArticleElementSection from "./article-element-section"
 import ArticleElementTags from "./article-element-tags"
 
-const ArticleElement = ({ title, description, date, slug, tags }) => {
+const ArticleElement = ({
+  title,
+  description,
+  date,
+  slug,
+  tags,
+  isWriting,
+}) => {
   return (
     <li key={slug}>
       <article
@@ -12,7 +19,12 @@ const ArticleElement = ({ title, description, date, slug, tags }) => {
         itemScope
         itemType="http://schema.org/Article"
       >
-        <ArticleElementHeader slug={slug} title={title} date={date} />
+        <ArticleElementHeader
+          slug={slug}
+          title={title}
+          date={date}
+          isWriting={isWriting}
+        />
         <ArticleElementSection description={description} />
         <ArticleElementTags tags={tags} />
       </article>

@@ -119,6 +119,7 @@ exports.createSchemaCustomization = ({ actions }) => {
       date: Date @dateformat
       tags: [String]
       series: String
+      isWriting: Boolean
     }
 
     type Fields {

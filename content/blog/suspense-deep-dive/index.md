@@ -1,9 +1,10 @@
 ---
 title: React Suspense 제대로 알아보기
-date: "2023-11-16"
+date: "2024-01-15"
 description: React Suspense를 제대로 사용하는 법과 내부 동작 원리를 파헤치기
 tags: [JS, React]
 series: React Deep dive
+isWriting: true
 ---
 
 ## 목차

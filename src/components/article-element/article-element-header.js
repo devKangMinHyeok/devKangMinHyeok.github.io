@@ -1,15 +1,22 @@
 import * as React from "react"
 import { Link } from "gatsby"
 
-const ArticleElementHeader = ({ slug, title, date }) => {
+const ArticleElementHeader = ({ slug, title, date, isWriting }) => {
   return (
     <header>
       <h2>
+        <div className="is-writing">
+          <small>{isWriting && "작성중"}</small>
+        </div>
         <Link to={slug} itemProp="url">
           <span itemProp="headline">{title}</span>
         </Link>
       </h2>
-      <small>{date}</small>
+      <div>
+        <div>
+          <small>{date}</small>
+        </div>
+      </div>
     </header>
   )
 }

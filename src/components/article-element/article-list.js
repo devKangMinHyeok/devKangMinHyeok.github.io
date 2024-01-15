@@ -23,6 +23,7 @@ const ArticleList = ({ posts }) => {
               date={post.frontmatter.date}
               slug={post.fields.slug}
               tags={post.frontmatter.tags}
+              isWriting={post.frontmatter.isWriting}
               key={post.fields.slug}
             />
           )

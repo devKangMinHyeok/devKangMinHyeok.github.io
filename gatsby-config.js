@@ -83,6 +83,7 @@ module.exports = {
                   description: node.excerpt,
                   date: node.frontmatter.date,
                   tags: node.frontmatter.tags,
+                  isWriting: node.frontmatter.isWriting,
                   url: site.siteMetadata.siteUrl + node.fields.slug,
                   guid: site.siteMetadata.siteUrl + node.fields.slug,
                   custom_elements: [{ "content:encoded": node.html }],
@@ -101,6 +102,7 @@ module.exports = {
                     title
                     date
                     tags
+                    isWriting
                   }
                 }
               }
