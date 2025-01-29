@@ -4,7 +4,7 @@ date: "2024-01-15"
 description: React Suspense가 등장한 배경과 그 이전의 React Concurrent Feature에 대해 알아보기 (feat. React 렌더링 과정)
 tags: [JS, React]
 series: React Deep dive
-isWriting: true
+isWriting: false
 ---
 
 ## 목차

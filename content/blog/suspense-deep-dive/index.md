@@ -1,5 +1,5 @@
 ---
-title: React Suspense - Suspense enabled data source & Suspense-enabled framework
+title: React Suspense - Suspense-enabled data source 와 Suspense-enabled framework
 date: "2024-02-19"
 description: React Suspense와 Suspense-enabled data source에 대해 알아보기
 tags: [JS, React]
@@ -13,9 +13,16 @@ isWriting: true
 - [So, Suspense로 무엇을 할 수 있는가?](#so-suspense로-무엇을-할-수-있는가)
   - [Contents를 로딩하는 동안 Fallback 표시하기](#contents를-로딩하는-동안-fallback-표시하기)
 - [Suspense-enabled data source](#suspense-enabled-data-source)
+- [Suspense-enabled framework](#suspense-enabled-framework)
   - [React-query](#react-query)
   - [SWR](#swr)
-  - [SWR과 React-query에서 suspense 사용시 발생하는 waterfall 문제와 해결방법](#swr과-react-query에서-suspense-사용시-발생하는-waterfall-문제와-해결방법)
+    - [SWR과 React-query에서 suspense 사용시 발생하는 waterfall 문제와 해결방법](#swr과-react-query에서-suspense-사용시-발생하는-waterfall-문제와-해결방법)
+  - [Redux & RTK-query](#redux--rtk-query)
+  - [Relay](#relay)
+  - [Next.js](#nextjs)
+    - [loading.js 파일로, 특정 페이지에 Suspense 기능 적용하기](#loadingjs-파일로-특정-페이지에-suspense-기능-적용하기)
+    - [Streaming With Suspense](#streaming-with-suspense)
+  - [라이브러리 없이 사용하기](#라이브러리-없이-사용하기)
 - [Reference](#reference)
 
 ## React Suspense가 등장한 배경
@@ -108,7 +115,9 @@ React와 관련된 **유명 라이브러리 또는 프레임워크**를 사용�
 
 **비동기 데이터**를 저장하는 스토어로 사용하는 **전역 상태 관리 라이브러리**나 **비동기 데이터 캐싱 및 관리 라이브러리**들 중 주로 많이 사용하는 것들을 비교해보자.
 
-#### React-query
+## Suspense-enabled framework
+
+### React-query
 
 [React Query v5 Docs - Suspense](https://tanstack.com/query/latest/docs/react/guides/suspense)를 참고해보면, `Suspense`를 공식적으로 지원한다.
 
@@ -196,7 +205,7 @@ export function useSuspenseQuery<
 
 [github - react-query | useSuspenseQuery 소스코드](https://github.com/TanStack/query/blob/main/packages/react-query/src/useSuspenseQuery.ts)를 살펴보면, 실제로 `baseQuery`에서 `suspense` 옵션을 켜주는 정도로 단순히 기존 `useQuery`를 **wrapping** 한 모습이다. `Suspense`를 더 명시적으로 사용하기 위해서 **새로운 훅**으로 만든 것으로 보인다.
 
-#### SWR
+### SWR
 
 [SWR Docs - Suspense](https://swr.vercel.app/ko/docs/suspense)를 참고하면, `swr`에서 `Suspense`를 사용하는 것을 권장하지는 않는 것으로 보인다.
 
@@ -537,7 +546,7 @@ const [{ data: user }, { data: posts }] = useSuspenseQueries({
 
 ![Alt text](image-5.png)
 
-#### redux & rtk-query
+### redux & rtk-query
 
 **rtk-query**는 **react-query**나 **swr**처럼 **비동기 데이터 캐싱**을 지원하고, 사용법도 비슷하다.
 
@@ -555,15 +564,39 @@ const [{ data: user }, { data: posts }] = useSuspenseQueries({
 
 현재로써 내가 찾아본 바로는, **suspense**를 위해 **rtk-query** library 자체에서 지원하는 **API는 아직 정식적으로 없는 것으로 보인다.**
 
-#### Relay
+### Relay
 
 GraphQL 클라이언트 프레임워크인 Relay를 사용한다면, [Loading States with Suspense | Relay Docs](https://relay.dev/docs/guided-tour/rendering/loading-states/) 에서 자세한 내용을 확인할 수 있다.
 
 Relay 와 관련된 내용은 따로 포스트를 작성할 예정이니, Relay에서도 suspense-enabled data source를 지원한다는 사실만 알고 넘어가자.
 
-#### Next.js
+### Next.js
 
-#### 라이브러리 없이 사용하기
+Next.js에서 제공하는 Suspense 관련 기능은 App Router 기준으로 설명하겠다.
+
+[Loading UI and Streaming | Next.js Docs](https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming) 를 살펴보면, 먼저 Next.js 프레임워크의 파일 라우팅 방식에서 특수하게 제공하는 Suspense 기능에 대한 내용이 있다.
+
+#### loading.js 파일로, 특정 페이지에 Suspense 기능 적용하기
+
+![Alt text](loading-special-file.avif)
+
+Next.js App Router 기준으로, 특정 페이지에 Suspense 기능을 적용하기 위해서는 `loading.js` 파일을 만들어서 사용할 수 있다.
+
+이 파일은 특정 페이지에 대한 데이터를 로드하는 동안 보여줄 로딩 UI를 정의하는 파일이다.
+
+실제로는 아래처럼 Page 를 `<Suspense>`로 감싼 것과 같은 동작을 한다.
+
+![Alt text](loading-overview.avif)
+
+> Recommendation: Use the loading.js convention for route segments (layouts and pages) as Next.js optimizes this functionality.
+>
+> [Next.js Docs | Loading UI and Streaming](https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming#instant-loading-states)
+
+Next.js 팀에서는 Next.js가 이 기능을 최적화하므로 Route Segment(Layouts 및 Pages)에는 `loading.js` 규칙을 사용하도록 권장하고 있다.
+
+#### Streaming With Suspense
+
+### 라이브러리 없이 사용하기
 
 ## Reference
 

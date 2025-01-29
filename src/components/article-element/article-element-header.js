@@ -5,9 +5,11 @@ const ArticleElementHeader = ({ slug, title, date, isWriting }) => {
   return (
     <header>
       <h2>
-        <div className="is-writing">
-          <small>{isWriting && "작성중"}</small>
-        </div>
+        {isWriting && (
+          <div className="is-writing">
+            <small>작성중</small>
+          </div>
+        )}
         <Link to={slug} itemProp="url">
           <span itemProp="headline">{title}</span>
         </Link>
