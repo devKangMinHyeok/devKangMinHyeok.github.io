@@ -1,7 +1,7 @@
 ---
-title: React Suspense 제대로 알아보기
-date: "2024-01-15"
-description: React Suspense를 제대로 사용하는 법과 내부 동작 원리를 파헤치기
+title: React Suspense - Suspense enabled data source & Suspense-enabled framework
+date: "2024-02-19"
+description: React Suspense와 Suspense-enabled data source에 대해 알아보기
 tags: [JS, React]
 series: React Deep dive
 isWriting: true
@@ -10,144 +10,25 @@ isWriting: true
 ## 목차
 
 - [React Suspense가 등장한 배경](#react-suspense가-등장한-배경)
-  - [공식 문서에서 배경 읽어보기](#공식-문서에서-배경-읽어보기)
-  - [Suspense 그 이전에 React Concurrent Feature부터](#suspense-그-이전에-react-concurrent-feature부터)
-  - [React의 Rendering은 원래 멈출 수 없어](#react의-rendering은-원래-멈출-수-없어)
-  - [React에서 렌더링이란?](#react에서-렌더링이란)
-  - [다시 돌아와 Suspense는 왜 등장했나](#다시-돌아와-suspense는-왜-등장했나)
+- [So, Suspense로 무엇을 할 수 있는가?](#so-suspense로-무엇을-할-수-있는가)
+  - [Contents를 로딩하는 동안 Fallback 표시하기](#contents를-로딩하는-동안-fallback-표시하기)
+- [Suspense-enabled data source](#suspense-enabled-data-source)
+  - [React-query](#react-query)
+  - [SWR](#swr)
+  - [SWR과 React-query에서 suspense 사용시 발생하는 waterfall 문제와 해결방법](#swr과-react-query에서-suspense-사용시-발생하는-waterfall-문제와-해결방법)
 - [Reference](#reference)
 
 ## React Suspense가 등장한 배경
 
-### 공식 문서에서 배경 읽어보기
+[직전 포스트](../why-suspense)에서 살펴보았듯이, React `v18`에서 도입된 `concurrent feature`들은 기본적으로 **React의 렌더링 과정을 더 정교하게 설계할 수 있도록 옵션을 준 것**이라고 생각할 수 있다.
 
-가장 먼저, React Suspense가 등장한 배경을 알기 위해서 React 공식문서로 접근해본다.
+그 `concurrent feature`들 중 `Suspense`는 개발자가 `Suspense` 경계를 직접 나누면서, **비동기 데이터가 준비되고 있는 동안에는 해당 컴포넌트가 중단(Suspensed)되고, 실제로 데이터가 로드되었을 때 해당 컴포넌트를 렌더링**한다.
 
-[React Suspense 공식 문서](https://react.dev/reference/react/Suspense)
-
-문서에서 Suspense를 검색해서 바로 보이는 화면은 아래와 같다.
-![Alt text](image-1.png)
-
-`<Suspense>` 컴포넌트로, `<SomeComponent/>` 를 감싸고 있고,
-`<Suspense>` 컴포넌트에는 **fallback**이라는 props에 `<Loading/>` 이라는 컴포넌트를 넣고 있다.
-
-> EN) `<Suspense>` lets you display a fallback until its children have finished loading.
-
-> KOR) `<Suspense>` 는 그 자식 컴포넌트가 로딩 상태가 종료될 때 까지 fallback을 보여주도록 한다.
-
-이라고 말하며, Suspense의 역할과 기능을 소개한다.
-
-그 외에는 딱히 어떤 배경에서 이 기능을 만들게 되었는지에 대해 설명해주는 단락이 보이지는 않는다.
-단지, Suspense에 해당하는 공식 문서의 내용은 Suspense 자체에 대한 사용법과 안내사항들이 나열되어 있다.
-
-그래서 따로 도입 배경을 찾아보기로 했다.
-
-### Suspense 그 이전에 React Concurrent Feature부터
-
-**Suspense**의 등장 배경을 이해하기 위해서는 기본적으로, React `v18`의 핵심인 **Concurrent Feature**에 대해 이해하고 있어야 한다.
-
-React는 기본적으로 JS 위에서 동작하고, JS는 기본적으로 **single thread**로 동작한다. 그 말은 즉, **React는 기본적으로 렌더링 동작이 일어나고 있을 때 main thread를 점령**하게 되고, 이 때문에 **진행중인 작업이 다 완료**되어야지만, **user event**와 같은 **interaction**에 대한 작업을 수행할 수 있다.
-
-이 부분은 당연하게도 사용자 경험에 악영향을 끼칠 수 있고, **web worker**를 활용하여 다른 thread를 사용하는 우회 방법도 있지만, 결국 <u>**React에서 렌더링의 우선순위를 유연하게 설계할 수 없다**</u>는 점은 분명한 한계였다.
-
-**React Rendering** 과정의 문제점들을 해결하기 위해, React의 코어팀은 **async rendering**이라는 개념을 소개하더니, 이후 점차 발전시켜 **Concurrent Feature**를 `v18`부터 적극적으로 밀고 있다.
-
-### React의 Rendering은 원래 멈출 수 없어
-
-지금 이야기하는 **Concurrent Rendering**과는 달리, 기본적으로 따로 처리를 하지 않는다면, <u>**React의 Rendering은 한번 시작하면 중단할 수 없다.**</u>
-
-별도로, **debounce**나 **throttle**과 같은 방법을 통해, 일정 시간 주기로 실행하거나 대기하도록 만드는 등의 방식으로 우회 전략을 세울 수도 있겠으나, 확실한 해결책은 될 수 없는 임시방편일 뿐이다.
-
-**이 문제를 제대로 해결하려면, Rendering 과정에 관여하여,** **Rendering 중단과 재개를 개발자가 컨트롤** 할 수 있어야 한다.
-
-그런데, `v17`에서 **Concurrent mode**를 opt-in으로 도입하기 시작하면서, 이제 React를 사용하는 개발자들에게 선택권이 주어지게 된다. ([React v17.0.0 릴리즈 노트 - concurrent mode](https://github.com/facebook/react/releases/tag/v17.0.0))
-
-바로, 이제는 **React Rendering의 순서에 개입**할 수 있게 된 것이다.
-
-React `v17`에서 `v18`로 넘어가면서, `Root`에서 `React App Component`를 렌더링하는 방식이 아래와 같이 바뀌었다.
-
-`v17`
-
-```jsx
-import ReactDOM from "react-dom"
-import App from "App"
-
-const container = document.getElementById("app")
-
-ReactDOM.render(<App />, container)
-```
-
-`v18`
-
-```jsx
-import ReactDOM from "react-dom"
-import App from "App"
-
-const container = document.getElementById("app")
-
-const root = ReactDOM.createRoot(container)
-
-root.render(<App />)
-```
-
-코드상의 차이는 크지 않지만, `createRoot`라는 새로운 API를 도입하면서, React `v18`의 기능에 접근할 수 있는 열쇠로 사용하였다.
-
-`createRoot API`를 사용해야, `concurrent feature`를 사용할 수 있다.
-
-### React에서 렌더링이란?
-
-먼저 간단하게 **React가 렌더링되는 방식**을 짚고 넘어가보자.
-사실 내부적으로 상당히 복잡하기 때문에, 이번 포스트에서는 간단히만 짚고 넘어가보겠다.
-
-일단 [클래스 라이프 사이클 메소드 다이어그램](https://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)을 살펴보면, **라이프 사이클 메소드 다이어그램**을 확인할 수 있다. **React에서 렌더링과 관련된 라이프 사이클**을 확인할 수 있다.
-
-[리액트의 렌더링은 어떻게 일어나는가?](https://yceffort.kr/2022/04/deep-dive-in-react-rendering)
-
-위 글은 **React 렌더링** 과정을 정말 잘 정리해놓아서, 참고하면 좋다. 기본적으로 **React**는 **컴포넌트가 처음 마운트 될때**와 **state나 props에 변경사항이 발생**하면, **컴포넌트가 렌더링**된다.
-
-> "리액트에서 렌더링이란, 컴포넌트가 현재 props와 state의 상태에 기초하여 UI를 어떻게 구성할지 컴포넌트에게 요청하는 작업을 의미한다."
->
-> yceffort blog
-
-위 인용구절처럼 결국 <u>**React는 props와 state가 변경되었을 때, 어떻게 UI에 보여줄 것인가에 초점이 맞추어져 있다.**</u>
-
-간단히 설명하자면, **React**는 `Virtual DOM`이라는 자체적인 **DOM 자료구조**를 가지고 있다. 이것은 **브라우저의 DOM**과 매우 유사한 자료구조로, **React가 실제 DOM을 업데이트하는 과정을 최적화**하기 위한 **Buffer**처럼 작동한다.
-
-이 `Virtual DOM`을 관리하기 위해서 **React**는 `Reconciliation`이라는 일련의 과정을 통해, **Virtual DOM과 기존의 Virtual DOM의 비교 작업을 수행하고, 변경사항을 Virtual DOM에 반영하는 과정**을 거친다.
-
-이러한 렌더링 과정을 **React**에서는, 크게 `Render Phase`와 `Commit Phase`로 나눈다.
-
-`Render Phase`에서는 **컴포넌트를 렌더링**하고, **변경 사항을 계산하는 작업을 수행**하고, `Commit Phase`는 **DOM에 변경사항을 적용**하는 과정을 수행한다.
-
-이때, **계산된 모든 과정을 실제 DOM에 적용하는 과정**은 **동기 시퀀스로 수행**된다.
-
-즉, <u>**기본적으로 React에서 렌더링과 이를 DOM에 적용하는 과정은 중단할 수 없다.**</u>
-
-하지만, `Concurrent Feature` 또는 `Concurrent Mode`는 **렌더링을 일시 중지**하고, **렌더링을 다시 시작**한다거나 하는 등의 조작이 가능하다.
-
-### 다시 돌아와 Suspense는 왜 등장했나
-
-`Suspense`는 결국 위에서 한참 이야기했던 문제인 "**React는 개발자가 렌더링을 유연하게 설계할 수 없다**"는 것을 **해결하기 위한 도구 중 하나** 인 것이다.
-
-`Suspense`는 React `v18`의 여러 **break change** 중 하나인 것이고, 사실 [React v16.6.0 체인지로그](https://github.com/facebook/react/blob/main/CHANGELOG.md#1660-october-23-2018)와 [React 소스코드 Github Commit - Remove unstable_prefix from Suspense #13922](https://github.com/facebook/react/pull/13922)를 보면, `v16.6.0`부터 **unstable** 딱지를 떼고 존재하던 기능이다.
-
-물론, 당시의 `Suspense`는 지금의 `Suspense`와는 꽤나 차이가 있다. `v18` 이전에는 단순히 **JS 번들 코드**를 **Lazy Loading**하는데 쓰이는 것이었다. `v18`부터는 이러한 컨셉의 `Suspense`를 확장하여 **Data fetching**과 같은 **비동기 작업**도 `Suspense`에 적용할 수 있게 만들었다.
-
-정리하자면, `Suspense`를 포함한 React `v18`의 `concurrent feature`들은 **React**를 사용하여 웹을 개발하는 개발자들이 <u>**React의 렌더링 과정을 더 정교하게 설계할 수 있도록 옵션을 준 것**</u>이라고 생각할 수 있다.
-
-그 중 `Suspense`는 **비동기 데이터 요청**을 포함한 **컴포넌트가 준비되기까지 fallback**을 보여주는 것을 기본 기능으로, **stale 컨텐츠를 다루는 방식, 하위 컴포넌트의 준비 여부와 노출에 대한 결정 등에 관여**할 수 있게 도와준다.
-
-`Suspense`는 **비동기 데이터 소스**를 통해 제어되고, `Suspense` 컴포넌트를 감싸는 방식으로 **그 경계를 세워두는 방식**으로 API를 제공한다. 개발자가 `Suspense` 경계를 직접 나누면서, <u>**비동기 데이터가 준비되고 있는 동안에는 해당 컴포넌트가 중단(Suspensed)되고, 실제로 데이터가 로드되었을 때 해당 컴포넌트를 렌더링**</u>한다.
-
-즉, 이제 React를 사용하는 개발자는 **어떤 컴포넌트를 언제 렌더링 중단 및 시작시킬지를 정할 수 있는 것**이다. 특히 `Suspense` 기능을 통해서는 **비동기 데이터 요청의 완료 여부**를 기준으로 **렌더링을 중단하고 시작**할 수 있는 것이다.
-
-결론적으로, `Suspense`는 <u>**React의 발전 흐름 상, 렌더링 과정을 컨트롤 할 수 있도록 만들어 주기위해서 나온 기능 중 하나**</u>이고, 특히 <u>**비동기 데이터 요청을 기준으로 한 렌더링 여부 처리를 개발자가 쉽게 컨트롤**</u>할 수 있도록 React에서 제공하는 기능인 것이라고 할 수 있다.
+`Suspense`의 등장 배경에 대한 자세한 내용은 직전 포스트 [React Suspense는 왜 등장했나](../why-suspense)에서 살펴볼 수 있다. 해당 포스트에서는 `Suspense`가 어떤 맥락에서 등장했고, 왜 필요한지에 대해 알아 볼 수 있다.
 
 ---
 
 ## So, Suspense로 무엇을 할 수 있는가?
-
-`Suspense`가 어떤 맥락에서 등장했고, 왜 필요한지에 대해 조금 자세히 알아 볼 수 있었다.
 
 이제는 `Suspense`로 우리가 어떻게 **사용자 경험(UX)** 을 더 높일 수 있는지, **어떻게 코드에 적용할 수 있는지** 알아볼 차례이다.
 
@@ -158,8 +39,6 @@ root.render(<App />)
 이 `<Suspense/>` 컴포넌트는 크게 두개의 요소를 필요로 한다.
 
 첫째로, **렌더링하려는 실제 UI 컴포넌트** 그리고 둘째로, **로딩 상태일 때 노출할 Fallback**이다.
-
-바로 코드로 보자. 지금까지 잔뜩 이야기를 풀었지만, 코드는 간단하다.
 
 ```jsx
 <Suspense fallback={<Loading />}>
@@ -197,9 +76,11 @@ function Loading() {
 
 `ArtistPage`는 `Albums` 컴포넌트에 `Suspense` 경계를 걸어두고, **fallback**으로 `Loading` 컴포넌트를 설정해두었다. 이렇게, `Suspense`를 적용하는 곳에서는 크게 어렵지 않게 사용할 수 있다.
 
-### Suspense-enabled data source
+## Suspense-enabled data source
 
-이제 여기서 가질 수 있는 의문점 하나가 생긴다. **Suspense 경계 내부에 있는 모든 컴포넌트의 비동기 데이터 소스로 부터의 준비 상태는 React가 자동으로 인식하는 것일까?**
+이제 여기서 가질 수 있는 의문점 하나가 생긴다.
+
+**Suspense 경계 내부에 있는 모든 컴포넌트의 비동기 데이터 소스로 부터의 준비 상태는 React가 자동으로 인식하는 것일까?**
 
 결론부터 말하자면, **그렇지 않다.** React 공식 문서에 따르면, <u>"**오직 Suspense-enalbed data sources만 Suspense 컴포넌트를 활성화 할 수 있다**"</u>고 말한다.
 
@@ -207,6 +88,7 @@ function Loading() {
 >
 > - Data fetching with Suspense-enabled frameworks like Relay and Next.js
 > - Lazy-loading component code with lazy
+> - Reading the value of a cached Promise with `use`
 >
 > Suspense does not detect when data is fetched inside an Effect or event handler.
 >
@@ -214,9 +96,9 @@ function Loading() {
 >
 > Suspense-enabled data fetching without the use of an opinionated framework is not yet supported. The requirements for implementing a Suspense-enabled data source are unstable and undocumented. An official API for integrating data sources with Suspense will be released in a future version of React.
 >
-> [React Suspense 공식 문서](https://react-ko.dev/reference/react/Suspense)
+> [React Suspense 공식 문서](https://ko.react.dev/reference/react/Suspense)
 
-공식 문서에 따르면, '**Relay나 Next와 같은 Suspense-enabled 프레임워크에서의 Data fetching**' 또는 '**lazy를 사용한 Lazy-loading 컴포넌트**'에서 `Suspense`를 사용할 수 있다고 한다.
+공식 문서에 따르면, '**Relay나 Next와 같은 Suspense-enabled 프레임워크에서의 Data fetching**', '**lazy를 사용한 Lazy-loading 컴포넌트**', '**`use`를 사용해서 캐시된 Promise 값을 읽는 상황**'에서 `Suspense`를 사용할 수 있다고 한다.
 
 그리고 `Suspense`는 **Effect**나 **Event Handler** 내부에서의 **fetching**은 감지하지 않는다고 한다.
 
@@ -673,17 +555,19 @@ const [{ data: user }, { data: posts }] = useSuspenseQueries({
 
 현재로써 내가 찾아본 바로는, **suspense**를 위해 **rtk-query** library 자체에서 지원하는 **API는 아직 정식적으로 없는 것으로 보인다.**
 
-#### recoil
+#### Relay
 
-#### jotai
+GraphQL 클라이언트 프레임워크인 Relay를 사용한다면, [Loading States with Suspense | Relay Docs](https://relay.dev/docs/guided-tour/rendering/loading-states/) 에서 자세한 내용을 확인할 수 있다.
 
-#### zustand
+Relay 와 관련된 내용은 따로 포스트를 작성할 예정이니, Relay에서도 suspense-enabled data source를 지원한다는 사실만 알고 넘어가자.
+
+#### Next.js
 
 #### 라이브러리 없이 사용하기
 
 ## Reference
 
-0. [Suspense | react-ko 공식 문서](https://react-ko.dev/reference/react/Suspense)
+0. [Suspense | react-ko 공식 문서](https://ko.react.dev/reference/react/Suspense)
 1. [Suspense in React 18: How it works, and how you can use it - By Peter Kellner | October 09, 2022](https://www.pluralsight.com/blog/software-development/suspense-react-18-explained)
 2. [Concurrent React - jay·2022년 8월 4일](https://velog.io/@jay/Concurrent-React)
 3. [리액트 18의 신기능 - 동시성 렌더링(Concurrent Rendering), 자동 일괄 처리(Automatic Batching) 등 - 2023년 2월 23일 Translator: Jeong Won Yoo Author: Shruti Kapoor (English)](https://www.freecodecamp.org/korean/news/riaegteu-18yi-singineung-dongsiseong-rendeoring-concurrent-rendering-jadong-ilgwal-ceori-automatic-batching-deung/)
