@@ -115,6 +115,8 @@ React와 관련된 **유명 라이브러리 또는 프레임워크**를 사용�
 
 **비동기 데이터**를 저장하는 스토어로 사용하는 **전역 상태 관리 라이브러리**나 **비동기 데이터 캐싱 및 관리 라이브러리**들 중 주로 많이 사용하는 것들을 비교해보자.
 
+---
+
 ## Suspense-enabled framework
 
 ### React-query
@@ -204,6 +206,8 @@ export function useSuspenseQuery<
 ```
 
 [github - react-query | useSuspenseQuery 소스코드](https://github.com/TanStack/query/blob/main/packages/react-query/src/useSuspenseQuery.ts)를 살펴보면, 실제로 `baseQuery`에서 `suspense` 옵션을 켜주는 정도로 단순히 기존 `useQuery`를 **wrapping** 한 모습이다. `Suspense`를 더 명시적으로 사용하기 위해서 **새로운 훅**으로 만든 것으로 보인다.
+
+---
 
 ### SWR
 
@@ -546,6 +550,8 @@ const [{ data: user }, { data: posts }] = useSuspenseQueries({
 
 ![Alt text](image-5.png)
 
+---
+
 ### redux & rtk-query
 
 **rtk-query**는 **react-query**나 **swr**처럼 **비동기 데이터 캐싱**을 지원하고, 사용법도 비슷하다.
@@ -564,11 +570,15 @@ const [{ data: user }, { data: posts }] = useSuspenseQueries({
 
 현재로써 내가 찾아본 바로는, **suspense**를 위해 **rtk-query** library 자체에서 지원하는 **API는 아직 정식적으로 없는 것으로 보인다.**
 
+---
+
 ### Relay
 
 GraphQL 클라이언트 프레임워크인 Relay를 사용한다면, [Loading States with Suspense | Relay Docs](https://relay.dev/docs/guided-tour/rendering/loading-states/) 에서 자세한 내용을 확인할 수 있다.
 
 Relay 와 관련된 내용은 따로 포스트를 작성할 예정이니, Relay에서도 suspense-enabled data source를 지원한다는 사실만 알고 넘어가자.
+
+---
 
 ### Next.js
 
@@ -596,7 +606,31 @@ Next.js 팀에서는 Next.js가 이 기능을 최적화하므로 Route Segment(L
 
 #### Streaming With Suspense
 
+[Next.js Docs | Streaming With Suspense](https://nextjs.org/docs/app/building-your-application/routing/loading-ui-and-streaming#streaming-with-suspense) 를 참고하면, App Router 기준으로 Streaming 기능을 사용시에 Suspense를 사용할 수 있는 방법에 대해 알 수 있다.
+
+![Alt text](image-7.png)
+
+위처럼 UI 컴포넌트 단위에서 Suspense와 함께 Streaming 기능을 사용할 수 있고, 자세한 내용은 위 공식문서를 참고하자.
+
+---
+
 ### 라이브러리 없이 사용하기
+
+React 공식문서에서는, <u>**Suspense-enabled framework를 사용하지 않고 Suspense를 사용하는 방법에 대해서는 현재 정식으로 지원하고 있지 않다.**</u>
+
+Suspense enabled data source를 구현하기 위한 요구사항이 아직 명확하지 않고, 문서화되지 않았다고 말한다.
+
+이번 React v19에서도 여전히 이 부분에 대한 문서화가 이루어지지 않았다. 그런데, **suspense-enabled data source**에 해당하는 항목이 하나 늘었는데, 이는 **'[use](https://ko.react.dev/reference/react/use) 를 사용해서 캐시된 Promise 값 읽기'** 도 **suspense-enabled data source**에 해당한다는 것이다.
+
+이 부분에 대한 자세한 내용은 추후에 따로 포스트를 작성해서 공유하도록 하겠다.
+
+---
+
+## Suspense는 모든 비동기 데이터 소스에 대해서 자동으로 동작하지 않는다.
+
+결론적으로, Suspense는 모든 비동기 데이터 소스에 대해서 자동으로 동작하지 않는다. React Suspense는 오직 **suspense-enabled data source**에 대해서만 동작한다.
+
+그리고 이 데이터 소스는 공식적으로는 **1) suspense-enabled framework를 적용**하는 경우나 **2) lazy를 활용한 지연 로딩 컴포넌트**, **3) use를 사용해서 캐시된 Promise 값을 읽는 경우**에만 사용할 수 있다.
 
 ## Reference
 
