@@ -1,13 +1,21 @@
 ---
-title: Next SSR에 대한 고찰 with app router (v13)
+title: Next App Router는 왜 등장했는가?
 date: "2024-03-16"
-description: Nextjs의 SSR과 server component에 대해 자세히 알아보기. v13에서 도입한 app router는 어떤 문제를 해결하는가?
+description: Nextjs v13에서 도입한 app router는 왜 등장했는가?
 tags: [JS, React, Next]
 series: React Deep dive
 isWriting: true
 ---
 
 ## 목차
+
+- [Next.js의 SSR은 무엇을 위해 존재하는가?](#nextjs의-ssr은-무엇을-위해-존재하는가)
+- [Next App Router와 Pages Router의 렌더링 방식은 어떻게 다른가?](#next-app-router와-pages-router의-렌더링-방식은-어떻게-다른가)
+  - [Pages Router에서 App Router으로의 전환 맥락](#pages-router에서-app-router으로의-전환-맥락)
+  - [Next v12와 v13의 React PeerDependency 버전 비교](#next-v12와-v13의-react-peerdependency-버전-비교)
+  - [App Router의 Rendering](#app-router의-rendering)
+  - [Recap](#recap)
+- [Reference](#reference)
 
 ## Next.js의 SSR은 무엇을 위해 존재하는가?
 
@@ -106,7 +114,7 @@ React와 Next의 동작 방식 차이를 생각해보면, 유저가 웹 사이�
 
 **이 개선 가능성에 대한 고민이 녹아든 것이 Next v13의 app router와 React의 server component** 조합이고, 이제 **Next v12와 v13**에서 웹 페이지를 렌더링하는 방식의 차이에 대해 이야기 해보려 한다.
 
-## Next v12와 v13의 렌더링 방식은 어떻게 다른가?
+## Next App Router와 Pages Router의 렌더링 방식은 어떻게 다른가?
 
 #### Pages Router에서 App Router으로의 전환 맥락
 
@@ -155,7 +163,7 @@ Nextjs 팀은, **Page Router**는 이러한 **최신 React의 Streaming** 방식
 
 결국 **v13**에서 가장 큰 변화인 **app router**는 **React v18**에서 도입된 **concurrent feature**들을 지원하고, **streaming** 방식의 **React**를 support하기 위한 움직임이라고 생각해도 큰 무리는 아니라고 본다.
 
-#### App Router의 Dynamic Rendering
+#### App Router의 Rendering
 
 > [**Next Docs의 Rendering Tab - Pages Router**](https://nextjs.org/docs/pages/building-your-application/rendering)
 >
@@ -177,6 +185,55 @@ Nextjs 팀은, **Page Router**는 이러한 **최신 React의 Streaming** 방식
 
 단순히 우리가 익히 알고 있는 **SSR(매 요청 시 마다 HTML을 렌더링하여 응답) 개념과는 다른 방식**이라고 말하고 싶은 의도로 보인다. 그리고 `Static Rendering`, `Dynamic Rendering`, `Streaming` 이라는 3가지 방식을 모두 **Server Rendering**이라는 범주에 묶으면서, **서버에서 렌더링을 수행한다는 것의 의미를 확장**하고자 하는 것처럼 느껴진다.
 
+각 렌더링 방식에 대한 자세한 내용은 추후에 다른 포스트에서 다루도록 하겠다.
+
+#### Recap
+
+Next `v13`에서 **officially stable 된 app router**는 최신 React의 **concurrent features(Server Components, Suspense 등)**을 더 잘 지원하기 위해서 등장했다.
+
+기존의 Pages Router의 구조로는 한계를 느끼고, App Router를 통해 **Streaming** 방식의 렌더링을 지원하려는 것이다. 그래서 기존에 존재하는 렌더링 방식과 개념들도, 이번 변화에 의해서 새롭게 정의되었다.
+
+그렇다면 정말 App Router의 등장으로 기존에 풀기 어려웠던 어떤 문제들이 실질적으로 해결되었는지 살펴보자.
+
+## Next App Router가 해결하고자 하는 문제
+
+#### Page Router의 Server Side Rendering의 한계
+
+Nextjs Page Router를 사용하여 [getServerSideProps API](https://nextjs.org/docs/pages/api-reference/functions/get-server-side-props)를 사용하는 경우 우리는 아래처럼 코드를 작성한다.
+
+```tsx
+import type { InferGetServerSidePropsType, GetServerSideProps } from "next"
+
+type Repo = {
+  name: string
+  stargazers_count: number
+}
+
+export const getServerSideProps = (async () => {
+  // Fetch data from external API
+  const res = await fetch("https://api.github.com/repos/vercel/next.js")
+  const repo: Repo = await res.json()
+  // Pass data to the page via props
+  return { props: { repo } }
+}) satisfies GetServerSideProps<{ repo: Repo }>
+
+export default function Page({
+  repo,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  return (
+    <main>
+      <p>{repo.stargazers_count}</p>
+    </main>
+  )
+}
+```
+
+이러한 getServerSideProps API 인터페이스에서는 **Page** 단위로 SSR이 수행된다.
+
+바로 이 지점이 **Page Router의 Server Side Rendering의 한계**로, 페이지 단위보다 더 작은 단위로 렌더링 방식을 결정하는 것이 어렵다는 것이다.
+
+사실 React server component 등장 이전에는, 위와 같은 한계가 존재한다해도 React 자체에서 이러한 한계를 뛰어 넘을 수 있는 방법이 없었다. 그런데 React server component가 등장하면서, React의 컴포넌트를 서버와 클라이언트 중 어디에서 렌더링할지 결정하는 것이 가능해졌다.
+
 ## Reference
 
 [What is server-side rendering in Next.JS? Pros and Cons | Marny Lopez - January 2023](https://www.devlane.com/blog/what-is-server-side-rendering-in-next-js-pros-and-cons)
@@ -189,6 +246,12 @@ Nextjs 팀은, **Page Router**는 이러한 **최신 React의 Streaming** 방식
 
 [Understanding React Server Components | Alice Alexandra Moore - August 1st 2023](https://vercel.com/blog/understanding-react-server-components)
 
-[Nextjs Docs | Server Components](https://nextjs.org/docs/app/building-your-application/rendering/server-components)
+[React 서버 컴포넌트 작동원리를 아주 쉽게 알아보자](https://blog.kmong.com/react-server-component%EB%A1%9C-%ED%94%84%EB%A1%A0%ED%8A%B8%EC%97%94%EB%93%9C-%EA%B0%9C%EB%B0%9C-%ED%98%81%EC%8B%A0%ED%95%98%EA%B8%B0-part-2-5cf0bf4416b0)
+
+[Nextjs Blog | Next.js 13.4](https://nextjs.org/blog/next-13-4#nextjs-app-router)
 
 [Nextjs Blog | Next.js 13](https://nextjs.org/blog/next-13#server-components)
+
+[Nextjs Docs | Server Components](https://nextjs.org/docs/app/building-your-application/rendering/server-components)
+
+[Nextjs Docs | What is streaming?](https://vercel.com/docs/fundamentals/what-is-streaming)
