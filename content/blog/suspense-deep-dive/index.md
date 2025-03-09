@@ -2,7 +2,7 @@
 title: React Suspense - Suspense-enabled data source 와 Suspense-enabled framework
 date: "2024-02-19"
 description: React Suspense와 Suspense-enabled data source에 대해 알아보기
-tags: [JS, React]
+tags: [Tech, Frontend, JS, React]
 series: React Deep dive
 isWriting: false
 ---
