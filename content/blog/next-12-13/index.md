@@ -17,17 +17,17 @@ isWriting: true
   - [Recap](#recap)
 - [Reference](#reference)
 
-## Next.js의 SSR은 무엇을 위해 존재하는가?
+## UX 관점에서 바라본 Nextjs의 SSR
 
-React의 Meta framework인 Next를 떠올리면 가장 먼저 연상되는 키워드는 SSR(Server Side Rendering)일 것이다.
+UI 라이브러리의 핵심은 유저의 사용 경험 증진이고, React 커뮤니티는 당연하게도 UX를 높히는 방향으로 발전하고 있다. UX를 높이는 방향에서, 가장 중요한 요소 중 하나는 **'유저가 얼마나 빨리 화면을 보고 상호작용 할 수 있는가'** 이다. 결국 React 커뮤니티에서 코어하게 발전되고 있는 대부분의 요소들은 위 목표로 귀결된다.
 
-기본적으로 React는 CSR(Client Side Rendering)으로 동작하기 때문에, SSR을 수행하기 위해서는 **Express와 같은 server**위에 React의 [**Server React DOM API**](https://react.dev/reference/react-dom/server)를 사용하거나 **Next와 같은 React Meta Framework**를 통해 가능하다.
+Nextjs의 SSR도 같은 맥락에서 **'유저가 얼마나 빨리 화면을 보고 상호작용 할 수 있는가'** 이라는 목표를 공유한다.
 
-요즘은 직접 SSR 환경을 구축해서 사용하는 경우보다는, Next를 사용하는 케이스가 많다. 그럼 일단 Next Docs에서 말하는 SSR을 살펴보자.
+원래 React는 CSR(Client Side Rendering)으로 동작한다. 따라서 SSR을 수행하기 위해서는 Express와 같은 server위에 React의 [**Server React DOM API**](https://ko.react.dev/reference/react-dom/server)를 사용하여 렌더링 서버를 자체 구축하거나, Next나 Remix와 같은 React Meta Framework를 통해 가능하다.
 
-> 일단 Next 12버전까지는 직접적으로 SSR이라는 단어를 Docs에서 언급하지만, **13버전 App router** 도입 이후는 **Dynamic Rendering**이라고 말하면서, SSR이라는 단어를 직접적으로 사용하지 않는다. 이에 대해서는 v12와 v13의 차이를 알고나면 자연스레 이해될 수 있는 부분이기 때문에, 천천히 뒤의 내용을 살펴보자.
+> 참고로 Next, Remix 등의 프레임워크도 내부적으로는 React의 Server React DOM API를 사용한다.
 
-먼저, **Next v12의 page router Docs를 기반**으로 이야기해보자.
+보통 직접 SSR 환경을 구축해서 사용하는 경우보다는, **Next, Remix 등의 프레임워크를 사용하는 경우가 많다**. 그럼 일단 Next Docs에서 말하는 SSR을 살펴보자.
 
 > If a page uses Server-side Rendering, the page HTML is generated on each request.
 >
@@ -35,88 +35,36 @@ React의 Meta framework인 Next를 떠올리면 가장 먼저 연상되는 키�
 
 Nextjs Docs에서는 SSR를 사용하면, **각 요청마다 HTML 페이지가 생성**된다고 이야기한다.
 
-> To use Server-side Rendering for a page, you need to `export` an `async` function called `getServerSideProps`. This function will be called by the server on every request.
->
-> [Nextjs Docs | Server-side Rendering (SSR)](https://nextjs.org/docs/pages/building-your-application/rendering/server-side-rendering)
+그럼, React의 CSR과 Nextjs Page Router의 SSR은 UX적으로 어떤 부분에서 달라질까?
 
-그리고 **Page Router 기반의 Nextjs**에서, SSR을 사용하기 위해서는 `getServerSideProps`라는 async 함수를 export 해야한다. 이 함수는 **매 요청마다, 서버에서 실행된다고 한다.**
-
-> For example, suppose that your page needs to pre-render frequently updated data (fetched from an external API). You can write getServerSideProps which fetches this data and passes it to Page like below
-
-그리고 각 page가 **external API**로부터 수신한 데이터를 **pre-render**하기 위해서는 `getServerSideProps`를 통해서 데이터를 수신하고 page에 pass하여 렌더링을 수행한다.
-
-```jsx
-export default function Page({ data }) {
-  // Render data...
-}
-
-// This gets called on every request
-export async function getServerSideProps() {
-  // Fetch data from external API
-  const res = await fetch(`https://.../data`)
-  const data = await res.json()
-
-  // Pass data to the page via props
-  return { props: { data } }
-}
-```
-
-이렇게 SSR을 했을 때 취할 수 있는 이점이나 해결할 수 있는 문제는 무엇일까?
-
-#### 1. SEO
-
-항상 SSR의 장점에 대해 이야기하면 놓치지 않고 끼어드는 녀석인 SEO이다.
-
-간단하게 설명하면, **React의 CSR은 결국 HTML 깡통에 JS가 로드되면 동적으로 페이지를 그려넣는 방식**이기 때문에, **검색엔진** 입장에서는 **JS까지 모두 내려받아야만 웹 사이트의 내용을 확인**할 수 있다.
-
-하지만 **SSR**은 미리 **HTML 페이지를 pre-render**해서 내려보내기 때문에, 검색 엔진이 데이터를 더 빠르게 찾을 수 있다.
-
-[검색 엔진은 기본적으로, 크롤러를 통해 웹 페이지를 찾고 인덱싱을 통해 DB에 해당 페이지의 내용을 분석한 결과(키워드, 컨텐츠 유형 등)를 저장한다.](https://ahrefs.com/blog/google-search-algorithm/)
-
-구글 봇과 같은 크롤러가 웹 사이트를 찾아서 인덱싱을 수행하려고 할때, 만약 CSR으로 작동하는 경우는 **웹 페이지 초기 로드시에 JS가 로드되지 않으면 검색 엔진이 제대로 인덱싱을 수행할 수 없다.**
-
-JS를 완전히 로드한 후에 인덱싱을 수행하는 등의 특별한 처리가 들어가지 않는 이상, **HTML을 pre-render해서 요청에 응답하는 SSR 방식이 검색 엔진 최적화에 더 이점**이 있다.
-
-물론 Google 검색 엔진은 [CSR과 같은 Dynamic Rendering 환경에도 크롤러가 중간에 Renderer를 끼고 인덱싱을 수행](https://developers.google.com/search/docs/crawling-indexing/javascript/dynamic-rendering?hl=ko) 할 수 있다. 하지만 권장되는 방법이 아닌, 임시방편이라고 명시한다.
-
-> Google 검색 센터 Docs의 SEO 기본 가이드를 참고하면, 구글에서 설명하는 SEO에 대한 기본적인 원리나 방법을 알 수 있다.
->
-> [Google 검색 센터 Docs | SEO 기본 가이드](https://developers.google.com/search/docs/fundamentals/seo-starter-guide?hl=ko)
-
-만약 SEO가 중요한 비즈니스 요구 사항이라면, Next의 SSR 기능이 유용할 것이다.
-
-#### 2. UX
+### Pure React CSR과 Nextjs Page Router SSR의 렌더링 동작 방식 차이
 
 React와 Next의 동작 방식 차이를 생각해보면, 유저가 웹 사이트에 접근했을 때 UX의 차이도 자연스럽게 유추할 수 있다.
 
-✅ **React**는 먼저 아주 **가벼운 HTML**을 받아서, 전체 웹사이트를 렌더링할 수 있는 **JS Bundle**를 요청해서 받아온다.
+<img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" alt="React" width="20" height="20"> **Pure React**는 먼저 아주 가벼운 HTML을 받아서, **전체 웹사이트를 렌더링할 수 있는 JS Bundle**를 요청해서 받아온다.
 
-✅ **Next**는 각 요청마다, **해당 페이지의 HTML을 즉시 rendering**해서 보낸다. 이후 필요한 **js chunk들은 hydration**되어 웹사이트가 interactive하게 된다.
+<img src="https://static-00.iconduck.com/assets.00/nextjs-icon-512x512-y563b8iq.png" alt="Next.js" width="20" height="20"> **Next**는 각 요청마다, 해당 페이지의 HTML을 React Component로부터 렌더링해서 보낸다. 이후 필요한 js chunk들은 hydration되어 웹사이트가 interactive하게 된다.
 
-그럼 **React**는 JS Bundle을 받아서 **'동적으로 HTML을 생성하기 전까지 유저는 화면을 볼 수 없고'**, **Next**는 먼저 렌더링 된 HTML을 내려주기 때문에 **'일단 유저가 화면에서 UI를 볼 수 있다'** 는 차이가 있다.
+그럼 <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" alt="React" width="20" height="20"> **Pure React**는 **JS Bundle을 받아서 동적으로 어플리케이션 전체의 HTML을 생성하기 전까지 유저는 화면을 볼 수 없고**, <img src="https://static-00.iconduck.com/assets.00/nextjs-icon-512x512-y563b8iq.png" alt="Next.js" width="20" height="20"> **Next**는 **현재 접근하려는 페이지에 대한 HTML과 해당 페이지의 JS Chunk를 받아오는 즉시 화면을 볼 수 있다**는 차이가 있다.
 
-✅ 결과적으로, **React**는 일단 JS Bundle을 받아오기만하면, 다른 Path로 Routing할 때 새롭게 HTML이나 JS를 요청하지 않고서, 동적으로 그릴 수 있다.
-즉, **첫 로딩은 느리지만 그 다음부터는 상대적으로 빠를 수 있다.**
+장단점을 조금 정리해보자면, <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" alt="React" width="20" height="20"> **Pure React**는 일단 JS Bundle을 받아오기만하면, 다른 Path로 Routing할 때 새롭게 HTML이나 JS를 요청하지 않고서, 동적으로 그릴 수 있다.
+즉, **첫 페이지 접근에 대한 로딩은 상대적으로 느리지만 그 이후부터는 상대적으로 빠를 수 있다.**
 
-✅ 반면, **Next**는 Page 단위로 HTML과 JS Chunk를 요청하기 때문에, 하나의 페이지에 첫 번째 접근할 때는 빠르지만, 다른 페이지로 Routing할 때는 결국 서버와의 통신을 통해 HTML과 JS chunk를 받아와야 하기 때문에, **첫 로딩은 빠르지만 그 다음 navigation 과정에서는 상대적으로 느릴 수 있다.**
+반면, <img src="https://static-00.iconduck.com/assets.00/nextjs-icon-512x512-y563b8iq.png" alt="Next.js" width="20" height="20"> **Next**는 Page 단위로 HTML과 JS Chunk를 요청하기 때문에, 하나의 페이지에 첫 번째 접근할 때는 빠르지만, 다른 페이지로 Routing할 때는 결국 서버와의 통신을 통해 다시 HTML과 JS chunk를 받아와야 하기 때문에, **첫 페이지 접근에 대한 로딩은 빠르지만 그 다음 navigation 과정에서는 상대적으로 느릴 수 있다.**
 
-지금은 너무 단편적으로 설명했는데, [Code Splitting과 lazy loading](https://www.nextree.io/code-splitting/)으로 **Plain React** 환경에서도 **페이지별로 필요한 JS 파일만 불러올 수 있다.** 이를 통해, **첫 로딩이 느리다는 단점을 일부 극복**할 수 있다.
+### (참고) Pure React / Nextjs 각각의 단점 극복하기
 
-또, **Next** 환경에서도 `<Link />` 컴포넌트를 사용하는 경우, **pre-fetching**을 통해 **미리 다른 페이지에서 필요한 파일**을 가져올 수 있다. 이 경우에는, 다른 페이지를 이동하는 시점 이전에 미리 페이지를 요청해서 받아두기 때문에, **페이지 간 이동이 느리다는 단점을 극복**할 수 있다.
+지금은 너무 단편적으로 설명했는데, [Code Splitting과 lazy loading](https://www.nextree.io/code-splitting/)으로 **Pure React** 환경에서도 **페이지별로 필요한 JS 파일만 불러올 수 있다.** 이를 통해, **첫 로딩이 느리다는 단점을 일부 극복**할 수 있다.
+
+또, **Next** 환경에서도 `<Link />` 컴포넌트를 사용하는 경우, **pre-fetching**을 통해 **미리 다른 페이지에서 필요한 파일**을 가져올 수 있다. 이 경우에는, 다른 페이지를 이동하는 시점 이전에 미리 페이지를 요청해서 받아두기 때문에, **페이지 간 이동이 느리다는 단점을 일부 극복**할 수 있다.
 
 그래서 최적화하기에 따라서 위 명제는 이야기가 조금 달라질 수도 있다. 하지만 일반적으로, **SSR의 경우 CSR보다 일단 유저가 초기 화면을 보게 되는 시간 자체가 빨라진다는 장점**이 있다.
 
-즉, [TTI(Time To Interactive)](https://web.dev/articles/tti) 측면에서 보면, **CSR**은 JS가 로드되고 DOM을 조작하여 화면을 그리면 바로 interactive하기 때문에, **'TTI'와 '[LCP(Largest Contentful Paint)](https://web.dev/articles/lcp) 혹은 [FCP(First Contentful Paint)](https://web.dev/articles/fcp)'가 거의 같고**
+### 웹 성능 지표로 바라본 CSR과 SSR의 차이
 
-반면, **SSR**은 pre-render된 HTML을 받아 먼저 화면을 보여주고 hydration을 통해 JS Chunk를 받아 interactive해지기 때문에 **LCP 또는 FCP는 빠르겠지만, TTI 까지의 Gap Time에서 유저는 non-interactive한 화면을 보게 된다**고 말할 수 있겠다.
+### App Router로의 전환 맥락과 의미
 
-그렇다면, 더 높은 수준에서 UX 증진을 위해서는 일단 **LCP(Largest Contentfull Paint)** 를 빠르게하는 것이 좋고, 추가로 **LCP 또는 FCP를 빠르게 하면서 TTI와의 간격을 줄일 수만 있다면, 더 높은 수준으로 성능 개선을 할 수 있을 것이다.**
-
-**이 개선 가능성에 대한 고민이 녹아든 것이 Next v13의 app router와 React의 server component** 조합이고, 이제 **Next v12와 v13**에서 웹 페이지를 렌더링하는 방식의 차이에 대해 이야기 해보려 한다.
-
-## Next App Router와 Pages Router의 렌더링 방식은 어떻게 다른가?
-
-#### Pages Router에서 App Router으로의 전환 맥락
+#### Pages Router에서 App Router로
 
 일단 [Next **v13.0**에서는 app router 방식은 production 환경에서는, Vercel 측에서 사용하지 않을 것을 권장](https://nextjs.org/blog/next-13#new-app-directory-beta)했다.
 그러나 [**v13.4** 이후부터는 **app router가 stable** 되었다](https://nextjs.org/blog/next-13-4#nextjs-app-router)고 이야기하며, 적극적으로 app router를 밀고 있는 추세이다.
@@ -233,6 +181,14 @@ export default function Page({
 바로 이 지점이 **Page Router의 Server Side Rendering의 한계**로, 페이지 단위보다 더 작은 단위로 렌더링 방식을 결정하는 것이 어렵다는 것이다.
 
 사실 React server component 등장 이전에는, 위와 같은 한계가 존재한다해도 React 자체에서 이러한 한계를 뛰어 넘을 수 있는 방법이 없었다. 그런데 React server component가 등장하면서, React의 컴포넌트를 서버와 클라이언트 중 어디에서 렌더링할지 결정하는 것이 가능해졌다.
+
+그럼 이제는 더 이상 Page 단위에서만 SSR을 수행하는 것이 아니라, 컴포넌트 단위로 렌더링 방식을 결정할 수 있는 방식을 도입할 수 있게 된 것이다.
+
+#### Page Router를 버려야 했던 맥락 생각해보기
+
+그렇다면 위 내용처럼 컴포넌트 단위로 서버에서 React Component의 렌더링을 수행하기 위해서는, Page Router의 구조가 불충분했던 것일까?
+
+#### App Router와 Server Component
 
 ## Reference
 
